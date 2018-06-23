@@ -1,0 +1,28 @@
+version: '3.4'
+
+services:
+  rabbit:
+    image: rabbitmq:3-management
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+
+  sender:
+    image: ${DOCKER_REGISTRY}sender
+    restart: unless-stopped
+    depends_on:
+      - rabbit
+    build:
+      context: .
+      dockerfile: Sender/Dockerfile    
+
+  receiver:
+    image: ${DOCKER_REGISTRY}receiver
+    restart: unless-stopped
+    depends_on:
+      - rabbit
+    build:
+      context: .
+      dockerfile: Receiver/Dockerfile
+
+  
