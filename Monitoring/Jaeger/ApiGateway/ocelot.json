@@ -1,0 +1,46 @@
+{
+  "ReRoutes": [
+    {
+      "DownstreamPathTemplate": "/WeatherForecast/",
+      "UpstreamPathTemplate": "/a",
+      "UpstreamHttpMethod": [
+        "Get"
+      ],
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5002
+        }
+      ],
+      "Key": "a"
+    },
+    {
+      "DownstreamPathTemplate": "/WeatherForecast/",
+      "UpstreamPathTemplate": "/b",
+      "UpstreamHttpMethod": [
+        "Get"
+      ],
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5003
+        }
+      ],
+      "Key": "b"
+    }
+  ],
+  "Aggregates": [
+    {
+      "ReRouteKeys": [
+        "a",
+        "b"
+      ],
+      "UpstreamPathTemplate": "/"
+    }
+  ],
+  "GlobalConfiguration": {
+    "BaseUrl": "https://localhost:5001"
+  }
+}
