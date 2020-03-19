@@ -17,15 +17,15 @@ namespace GenericHost
                     theme: AnsiConsoleTheme.Literate)
                 .CreateLogger();
 
-            var hostBuilder = new HostBuilder()
+            var hostBuilder = Host.CreateDefaultBuilder()
+                .ConfigureLogging(builder =>
+                {
+                    builder.AddSerilog();
+                })
                 .ConfigureServices(services =>
                 {
                     services.AddHostedService<TimerService>();
                     services.AddScoped<IScopedDependency, ScopedDependency>();
-                })
-                .ConfigureLogging(builder =>
-                {
-                    builder.AddSerilog();
                 });
 
             await hostBuilder.RunConsoleAsync();

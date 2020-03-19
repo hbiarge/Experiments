@@ -9,13 +9,13 @@ namespace GenericHost.Services
 {
     public sealed class TimerService: IHostedService, IDisposable
     {
-        private readonly IHostingEnvironment _env;
+        private readonly IHostEnvironment _env;
         private readonly IServiceProvider _provider;
         private readonly ILogger<TimerService> _logger;
         private Timer _timer;
 
         public TimerService(
-            IHostingEnvironment env,
+            IHostEnvironment env,
             IServiceProvider provider,
             ILogger<TimerService> logger)
         {
@@ -53,15 +53,13 @@ namespace GenericHost.Services
 
         private void DoWork(object state)
         {
-            using (var scope = _provider.CreateScope())
-            {
-                var scopedService = scope.ServiceProvider.GetRequiredService<IScopedDependency>();
+            using var scope = _provider.CreateScope();
+            var scopedService = scope.ServiceProvider.GetRequiredService<IScopedDependency>();
 
-                _logger.LogInformation(
-                    "DoWork with id: {id}. Now: {now}", 
-                    scopedService.GetId(),
-                    DateTimeOffset.Now);
-            }
+            _logger.LogInformation(
+                "DoWork with id: {id}. Now: {now}", 
+                scopedService.GetId(),
+                DateTimeOffset.Now);
         }
     }
 }

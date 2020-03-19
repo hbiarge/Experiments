@@ -52,7 +52,7 @@ namespace WindowsService
                 return (false, Directory.GetCurrentDirectory());
             }
 
-            var pathToExe = Process.GetCurrentProcess().MainModule.FileName;
+            var pathToExe = Process.GetCurrentProcess().MainModule?.FileName;
             return (true, Path.GetDirectoryName(pathToExe));
         }
     }
