@@ -1,13 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <UserSecretsId>d9206092-82fe-43b6-a20a-4e57dc49fae3</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Ocelot" Version="13.8.0-alpha0014" />
-    <PackageReference Include="OpenTracing.Contrib.NetCore" Version="0.6.0" />
+    <PackageReference Include="Ocelot" Version="14.1.0" />
+    <PackageReference Include="OpenTracing.Contrib.NetCore" Version="0.6.2" />
   </ItemGroup>
 
   <ItemGroup>
