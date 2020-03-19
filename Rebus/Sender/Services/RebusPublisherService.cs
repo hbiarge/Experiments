@@ -10,14 +10,14 @@ namespace Sender.Services
 {
     public sealed class RebusPublisherService : IHostedService, IDisposable
     {
-        private readonly IHostingEnvironment _env;
+        private readonly IHostEnvironment _env;
         private readonly IBus _bus;
         private readonly ILogger<RebusPublisherService> _logger;
 
         private Timer _timer;
 
         public RebusPublisherService(
-            IHostingEnvironment env,
+            IHostEnvironment env,
             IBus bus,
             ILogger<RebusPublisherService> logger)
         {

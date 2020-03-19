@@ -1,26 +1,26 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Messages;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Rebus.Bus;
+using Rebus.ServiceProvider;
 
 namespace Receiver.Services
 {
-    public sealed class RebusReceiverService : IHostedService, IDisposable
+    public sealed class RebusReceiverService : IHostedService
     {
-        private readonly IHostingEnvironment _env;
-        private readonly IBus _bus;
+        private readonly IHostEnvironment _env;
         private readonly ILogger<RebusReceiverService> _logger;
 
         public RebusReceiverService(
-            IHostingEnvironment env,
-            IBus bus,
+            IHostEnvironment env,
+            IServiceProvider serviceProvider,
             ILogger<RebusReceiverService> logger)
         {
             _env = env;
-            _bus = bus;
+
+            serviceProvider.UseRebus();
+
             _logger = logger;
         }
 
@@ -36,11 +36,6 @@ namespace Receiver.Services
             _logger.LogInformation("Rebus receiver service  is stopping.");
 
             return Task.CompletedTask;
-        }
-
-        public void Dispose()
-        {
-            _bus?.Dispose();
         }
     }
 }

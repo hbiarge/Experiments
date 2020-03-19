@@ -21,28 +21,26 @@ namespace Receiver
                 .CreateLogger();
 
             var hostBuilder = new HostBuilder()
+                .ConfigureLogging(builder =>
+                {
+                    builder.AddSerilog();
+                })
                 .ConfigureServices(services =>
                 {
-                    services.AddHostedService<RebusReceiverService>();
+                    services.AutoRegisterHandlersFromAssemblyOf<PrintDateTime>();
 
                     services.AddRebus((config, scopedServices) =>
                     {
                         config
                             .Logging(l => l.Serilog())
-                            .Transport(t =>
-                            {
-                                t.UseRabbitMq("amqp://guest:guest@rabbit:5672", "timeProcessing");
-                            });
+                            .Transport(t => { t.UseRabbitMq("amqp://guest:guest@rabbit:5672", "timeProcessing"); });
 
                         return config;
                     });
-
-                    services.AutoRegisterHandlersFromAssemblyOf<PrintDateTime>();
-                })
-                .ConfigureLogging(builder =>
-                {
-                    builder.AddSerilog();
+                    
+                    services.AddHostedService<RebusReceiverService>();
                 });
+
 
             await hostBuilder.RunConsoleAsync();
         }

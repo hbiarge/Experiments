@@ -22,6 +22,10 @@ namespace Sender
                 .CreateLogger();
 
             var hostBuilder = new HostBuilder()
+                .ConfigureLogging(builder =>
+                {
+                    builder.AddSerilog();
+                })
                 .ConfigureServices(services =>
                 {
                     services.AddRebus((config, scopedServices) =>
@@ -36,10 +40,6 @@ namespace Sender
                     });
 
                     services.AddHostedService<RebusPublisherService>();
-                })
-                .ConfigureLogging(builder =>
-                {
-                    builder.AddSerilog();
                 });
 
             await hostBuilder.RunConsoleAsync();
