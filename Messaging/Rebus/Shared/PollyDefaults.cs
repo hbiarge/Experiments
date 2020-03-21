@@ -19,25 +19,24 @@ namespace Shared
             HttpPolicyExtensions
                 .HandleTransientHttpError()
                 .Or<TimeoutRejectedException>() // thrown by Polly's TimeoutPolicy if the inner call times out
-                .WaitAndRetryAsync(new[]
-                    {
-                        TimeSpan.FromSeconds(1),
-                        TimeSpan.FromSeconds(3),
-                        TimeSpan.FromSeconds(5)
-                    },
+                .WaitAndRetryAsync(
+                    retryCount: 3,
+                    sleepDurationProvider: (retryNumber, context) => TimeSpan.FromSeconds(retryNumber),
                     onRetry: (outcome, timespan, retryAttempt, context) =>
                     {
-                        var logger = di.GetService<ILogger>();
+                        var loggerFactory = di.GetRequiredService<ILoggerFactory>();
+                        var logger = loggerFactory.CreateLogger("PollyDefaults");
                         logger.LogWarning("Delaying for {delay}ms, then making retry {retry}.", timespan.TotalMilliseconds, retryAttempt);
                     });
 
         // Timeout for an individual try
         public static readonly Func<IServiceProvider, HttpRequestMessage, IAsyncPolicy<HttpResponseMessage>> TimeoutPolicyBuilder = (di, request) =>
             Policy.TimeoutAsync<HttpResponseMessage>(
-                seconds: 10,
+                seconds: 15,
                 onTimeoutAsync: (context, timeout, task) =>
                 {
-                    var logger = di.GetService<ILogger>();
+                    var loggerFactory = di.GetRequiredService<ILoggerFactory>();
+                    var logger = loggerFactory.CreateLogger("PollyDefaults");
                     logger.LogWarning("The timeout of {delay}ms for this request has expired.", timeout.TotalMilliseconds);
                     return Task.CompletedTask;
                 });

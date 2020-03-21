@@ -1,0 +1,42 @@
+# tye application configuration file
+# read all about it at https://github.com/dotnet/tye
+#
+# when you've given us a try, we'd love to know what you think:
+#    https://aka.ms/AA7q20u
+#
+name: estimations
+services:
+- name: api
+  project: Api/Api.csproj
+  bindings:
+  - port: 5000
+- name: processmanager
+  project: ProcessManager/ProcessManager.csproj
+- name: externalimageprocessor
+  project: ExternalImageProcessor/ExternalImageProcessor.csproj
+- name: estimationprocessor
+  project: EstimationProcessor/EstimationProcessor.csproj
+- name: callbacknotifier
+  project: CallbackNotifier/CallbackNotifier.csproj
+- name: imagedownloads
+  project: ImageDownloads/ImageDownloads.csproj
+- name: images
+  project: Images/Images.csproj
+  bindings:
+  - port: 5001
+- name: imageprocess
+  project: ImageProcess/ImageProcess.csproj
+  bindings:
+  - port: 5002
+- name: estimations
+  project: Estimations/Estimations.csproj
+  bindings:
+  - port: 5003
+- name: notifications
+  project: Notifications/Notifications.csproj
+  bindings:
+  - port: 5004
+- name: stateholder
+  project: StateHolder/StateHolder.csproj
+  bindings:
+  - port: 5005

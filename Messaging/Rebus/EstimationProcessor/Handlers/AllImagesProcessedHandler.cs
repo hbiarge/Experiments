@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Messages;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Rebus.Bus;
 using Rebus.Handlers;
 using Shared;
@@ -15,12 +16,18 @@ namespace EstimationProcessor.Handlers
     {
         private readonly IBus _bus;
         private readonly IHttpClientFactory _httpClientFactory;
+        private readonly ServicesConfiguration _servicesConfiguration;
         private readonly ILogger<AllImagesProcessedHandler> _logger;
 
-        public AllImagesProcessedHandler(IBus bus, IHttpClientFactory httpClientFactory, ILogger<AllImagesProcessedHandler> logger)
+        public AllImagesProcessedHandler(
+            IBus bus, 
+            IHttpClientFactory httpClientFactory,
+            IOptions<ServicesConfiguration> servicesConfiguration,
+            ILogger<AllImagesProcessedHandler> logger)
         {
             _bus = bus;
             _httpClientFactory = httpClientFactory;
+            _servicesConfiguration = servicesConfiguration.Value;
             _logger = logger;
         }
 
@@ -34,7 +41,7 @@ namespace EstimationProcessor.Handlers
 
             var contentString = System.Text.Json.JsonSerializer.Serialize(new
             {
-                CallbackUrl = $"{Constants.KnownUris.ApiBaseUri}/ExternalEstimation/{message.CaseNumber:D}",
+                CallbackUrl = $"{_servicesConfiguration.Api.BaseUrl}/ExternalEstimation/{message.CaseNumber:D}",
                 Metadata = message.Metadata
             });
             var content = new StringContent(contentString, Encoding.UTF8, MediaTypeNames.Application.Json);
@@ -42,7 +49,7 @@ namespace EstimationProcessor.Handlers
             try
             {
                 await client.PostAsync(
-                    new Uri($"{Constants.KnownUris.EstimationsBaseUri}/Estimation"),
+                    new Uri($"{_servicesConfiguration.Estimations.BaseUrl}/Estimation"),
                     content);
 
                 _logger.LogInformation(

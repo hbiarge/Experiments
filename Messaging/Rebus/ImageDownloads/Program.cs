@@ -6,6 +6,7 @@ using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Polly;
 using Polly.Extensions.Http;
 using Rebus.Config;
@@ -51,6 +52,9 @@ namespace ImageDownloads
                 {
                     services.AddApplicationInsightsTelemetryWorkerService(Constants.ApplicationInsightsInstrumentationKey);
                     services.AddSingleton<ITelemetryInitializer>(sp => new ServiceNameInitializer(Constants.Services.ImageDownloadService));
+
+                    services.Configure<ServicesConfiguration>(hostContext.Configuration.GetSection("Service"));
+                    services.AddSingleton<IPostConfigureOptions<ServicesConfiguration>, ServicesPostConfiguration>();
 
                     services.AddHttpClient("images")
                         .AddPolicyHandler(PollyDefaults.RetryPolicyBuilder)

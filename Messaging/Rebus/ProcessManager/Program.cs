@@ -5,6 +5,7 @@ using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using ProcessManager.Handlers;
 using Rebus.Config;
 using Rebus.Persistence.FileSystem;
@@ -51,6 +52,9 @@ namespace ProcessManager
                 {
                     services.AddApplicationInsightsTelemetryWorkerService(Constants.ApplicationInsightsInstrumentationKey);
                     services.AddSingleton<ITelemetryInitializer>(sp => new ServiceNameInitializer(Constants.Services.ProcessManagerService));
+
+                    services.Configure<ServicesConfiguration>(hostContext.Configuration.GetSection("Service"));
+                    services.AddSingleton<IPostConfigureOptions<ServicesConfiguration>, ServicesPostConfiguration>();
 
                     // Automatically register all handlers from the assembly of a given type...
                     services.AutoRegisterHandlersFromAssemblyOf<EstimationSaga>();

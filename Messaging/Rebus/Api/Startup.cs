@@ -6,13 +6,10 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Polly;
-using Polly.Extensions.Http;
+using Microsoft.Extensions.Options;
 using Rebus.Config;
 using Rebus.Routing.TypeBased;
 using Rebus.ServiceProvider;
-using Serilog;
 using Shared;
 using StateHolder;
 
@@ -32,10 +29,16 @@ namespace Api
             services.AddApplicationInsightsTelemetry(Constants.ApplicationInsightsInstrumentationKey);
             services.AddSingleton<ITelemetryInitializer>(sp => new ServiceNameInitializer(Constants.Services.Api));
 
+            services.Configure<ServicesConfiguration>(Configuration.GetSection("Service"));
+            services.AddSingleton<IPostConfigureOptions<ServicesConfiguration>, ServicesPostConfiguration>();
+
             services.AddControllers();
 
-            services.AddGrpcClient<StateHolderService.StateHolderServiceClient>(
-                    o => o.Address = new Uri(Constants.KnownUris.StateHolderUri))
+            services.AddGrpcClient<StateHolderService.StateHolderServiceClient>((sp, options) =>
+                {
+                    var servicesConfiguration = sp.GetService<IOptions<ServicesConfiguration>>();
+                    options.Address = new Uri(servicesConfiguration.Value.StateHolder.BaseUrl);
+                })
                 .AddPolicyHandler(PollyDefaults.RetryPolicyBuilder)
                 .AddPolicyHandler(PollyDefaults.TimeoutPolicyBuilder);
 

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using Shared;
 
 namespace Notifications
@@ -21,6 +22,9 @@ namespace Notifications
         {
             services.AddApplicationInsightsTelemetry(Constants.ApplicationInsightsInstrumentationKey);
             services.AddSingleton<ITelemetryInitializer>(sp => new ServiceNameInitializer(Constants.Services.External.Notification));
+
+            services.Configure<ServicesConfiguration>(Configuration.GetSection("Service"));
+            services.AddSingleton<IPostConfigureOptions<ServicesConfiguration>, ServicesPostConfiguration>();
 
             services.AddControllers();
         }

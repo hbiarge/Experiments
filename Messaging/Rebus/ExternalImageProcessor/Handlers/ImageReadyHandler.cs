@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Messages;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Rebus.Bus;
 using Rebus.DataBus;
 using Rebus.Handlers;
@@ -15,12 +16,18 @@ namespace ExternalImageProcessor.Handlers
     {
         private readonly IBus _bus;
         private readonly IHttpClientFactory _httpClientFactory;
+        private readonly ServicesConfiguration _servicesConfiguration;
         private readonly ILogger<ImageReadyHandler> _logger;
 
-        public ImageReadyHandler(IBus bus, IHttpClientFactory httpClientFactory, ILogger<ImageReadyHandler> logger)
+        public ImageReadyHandler(
+            IBus bus,
+            IHttpClientFactory httpClientFactory,
+            IOptions<ServicesConfiguration> servicesConfiguration,
+            ILogger<ImageReadyHandler> logger)
         {
             _bus = bus;
             _httpClientFactory = httpClientFactory;
+            _servicesConfiguration = servicesConfiguration.Value;
             _logger = logger;
         }
 
@@ -40,12 +47,12 @@ namespace ExternalImageProcessor.Handlers
                 {
                     {new StringContent(message.CaseNumber.ToString("D")), "CaseNumber"},
                     {new StringContent(message.ImageId.ToString("G")), "ImageId"},
-                    {new StringContent($"{Constants.KnownUris.ApiBaseUri}/ExternalImageProcess/{message.CaseNumber:D}/images/{message.ImageId:G}"), "CallbackUrl"},
+                    {new StringContent($"{_servicesConfiguration.Api.BaseUrl}/ExternalImageProcess/{message.CaseNumber:D}/images/{message.ImageId:G}"), "CallbackUrl"},
                     {new StreamContent(await DataBusAttachment.OpenRead(message.ImageTicket)), "image"}
                 };
 
                 await client.PostAsync(
-                    new Uri($"{Constants.KnownUris.ImageProcessBaseUri}/ImageProcess"),
+                    new Uri($"{_servicesConfiguration.ImageProcess.BaseUrl}/ImageProcess"),
                     content);
 
                 _logger.LogInformation(

@@ -6,8 +6,7 @@ using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Polly;
-using Polly.Extensions.Http;
+using Microsoft.Extensions.Options;
 using Rebus.Config;
 using Rebus.Routing.TypeBased;
 using Rebus.ServiceProvider;
@@ -51,6 +50,9 @@ namespace EstimationProcessor
                 {
                     services.AddApplicationInsightsTelemetryWorkerService(Constants.ApplicationInsightsInstrumentationKey);
                     services.AddSingleton<ITelemetryInitializer>(sp => new ServiceNameInitializer(Constants.Services.EstimationService));
+
+                    services.Configure<ServicesConfiguration>(hostContext.Configuration.GetSection("Service"));
+                    services.AddSingleton<IPostConfigureOptions<ServicesConfiguration>, ServicesPostConfiguration>();
 
                     services.AddHttpClient("estimations")
                         .AddPolicyHandler(PollyDefaults.RetryPolicyBuilder)

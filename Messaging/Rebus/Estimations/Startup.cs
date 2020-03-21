@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Polly;
 using Polly.Extensions.Http;
 using Shared;
@@ -25,6 +26,9 @@ namespace Estimations
         {
             services.AddApplicationInsightsTelemetry(Constants.ApplicationInsightsInstrumentationKey);
             services.AddSingleton<ITelemetryInitializer>(sp => new ServiceNameInitializer(Constants.Services.External.Estimations));
+
+            services.Configure<ServicesConfiguration>(Configuration.GetSection("Service"));
+            services.AddSingleton<IPostConfigureOptions<ServicesConfiguration>, ServicesPostConfiguration>();
 
             services.AddControllers();
 
