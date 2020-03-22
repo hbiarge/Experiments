@@ -1,4 +1,4 @@
-﻿namespace Shared
+namespace Shared
 {
     public static class Constants
     {
@@ -51,17 +51,7 @@
 
         public static class FileSystem
         {
-            public const string SagasPath = @"c:\src\trash\rebus\sagas";
-        }
-
-        public static class KnownUris
-        {
-            public const string ApiBaseUri = "http://localhost:5000";
-            public const string ImagesBaseUri = "http://localhost:5001";
-            public const string ImageProcessBaseUri = "http://localhost:5002";
-            public const string EstimationsBaseUri = "http://localhost:5003";
-            public const string NotificationsBaseUri = "http://localhost:5004";
-            public const string StateHolderUri = "https://localhost:5005";
+            public const string SagasPath = "rebus/sagas";
         }
     }
 }

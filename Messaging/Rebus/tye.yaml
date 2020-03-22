@@ -40,3 +40,4 @@ services:
   project: StateHolder/StateHolder.csproj
   bindings:
   - port: 5005
+    protocol: https

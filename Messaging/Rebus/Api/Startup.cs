@@ -1,4 +1,6 @@
 using System;
+using System.Net.Http;
+using System.Reflection.Metadata.Ecma335;
 using Messages;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.Builder;
@@ -17,12 +19,14 @@ namespace Api
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, IHostEnvironment environment)
         {
             Configuration = configuration;
+            Environment = environment;
         }
 
         public IConfiguration Configuration { get; }
+        public IHostEnvironment Environment { get; }
 
         public void ConfigureServices(IServiceCollection services)
         {
@@ -38,6 +42,17 @@ namespace Api
                 {
                     var servicesConfiguration = sp.GetService<IOptions<ServicesConfiguration>>();
                     options.Address = new Uri(servicesConfiguration.Value.StateHolder.BaseUrl);
+                })
+                .ConfigurePrimaryHttpMessageHandler(() =>
+                {
+                    var handler = new HttpClientHandler();
+
+                    if (Environment.IsDevelopment())
+                    {
+                        handler.ServerCertificateCustomValidationCallback = (message, certificate, chain, errors) => true;
+                    }
+
+                    return handler;
                 })
                 .AddPolicyHandler(PollyDefaults.RetryPolicyBuilder)
                 .AddPolicyHandler(PollyDefaults.TimeoutPolicyBuilder);

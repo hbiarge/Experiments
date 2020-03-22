@@ -14,20 +14,23 @@ namespace Shared
 
         public class HostInfo
         {
-            public string Port { get; set; }
-            
+            public string Protocol { get; set; } = "http";
+
             public string Host { get; set; }
-            
-            public string BaseUrl => $"http://{Host}:{Port}";
-            
+
+            public string Port { get; set; }
+
+            public string BaseUrl => $"{Protocol}{Uri.SchemeDelimiter}{Host}:{Port}";
+
             public static HostInfo Create(string url)
             {
-                var parts = url.Split(':', StringSplitOptions.RemoveEmptyEntries);
+                var uri = new Uri(url);
 
                 return new HostInfo
                 {
-                    Host = parts[0],
-                    Port = parts[1]
+                    Protocol = uri.Scheme,
+                    Host = uri.Host,
+                    Port = uri.Port.ToString("D")
                 };
             }
         }
@@ -41,32 +44,32 @@ namespace Shared
         {
             if (options.Api is null)
             {
-                options.Api = ServicesConfiguration.HostInfo.Create("localhost:5000");
+                options.Api = ServicesConfiguration.HostInfo.Create("http://localhost:5000");
             }
 
             if (options.Images is null)
             {
-                options.Images = ServicesConfiguration.HostInfo.Create("localhost:5001");
+                options.Images = ServicesConfiguration.HostInfo.Create("http://localhost:5001");
             }
 
             if (options.ImageProcess is null)
             {
-                options.ImageProcess = ServicesConfiguration.HostInfo.Create("localhost:5002");
+                options.ImageProcess = ServicesConfiguration.HostInfo.Create("http://localhost:5002");
             }
 
             if (options.Estimations is null)
             {
-                options.Estimations = ServicesConfiguration.HostInfo.Create("localhost:5003");
+                options.Estimations = ServicesConfiguration.HostInfo.Create("http://localhost:5003");
             }
 
             if (options.Notifications is null)
             {
-                options.Notifications = ServicesConfiguration.HostInfo.Create("localhost:5004");
+                options.Notifications = ServicesConfiguration.HostInfo.Create("http://localhost:5004");
             }
 
             if (options.StateHolder is null)
             {
-                options.StateHolder = ServicesConfiguration.HostInfo.Create("localhost:5005");
+                options.StateHolder = ServicesConfiguration.HostInfo.Create("https://localhost:5005");
             }
         }
     }
