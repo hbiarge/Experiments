@@ -2,7 +2,7 @@
 {
     public static class Constants
     {
-        public const string ApplicationInsightsInstrumentationKey = "723add8f-4d10-4dc7-ae9f-0a0a00e81c35";
+        public const string ApplicationInsightsInstrumentationKey = "AI instrumentation key";
 
         public static class Azure
         {
@@ -10,12 +10,12 @@
             {
                 // RootManageSharedAccessKey for the demo purposes. Then you can tell rebus to use access policies without management permissions
                 // so Rebus does not try to create the queues
-                public const string ConnectionString = "Endpoint=sb://rebus-messaging.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=S0O5KH2TMkCravMwqHOJod++fkQ6UW/ozL/5tY5TFWE=";
+                public const string ConnectionString = "ServiceBus connection string";
             }
 
             public static class Storage
             {
-                public const string ConnectionString = "DefaultEndpointsProtocol=https;AccountName=rebusmessaging;AccountKey=OcUHSvmMzi5083qw/yMQTiUKTHGkV/l9ibM4rioJlM5g0HWbmqCSwRGOT4UcXvmZMQyb8rxZQ7gNEe3OuDkqsg==;EndpointSuffix=core.windows.net";
+                public const string ConnectionString = "Storage connection string";
                 public const string DataBusContainer = "databus";
             }
         }
