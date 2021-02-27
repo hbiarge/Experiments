@@ -56,7 +56,7 @@ namespace Acheve.Application.ProcessManager.Handlers
         public async Task Handle(EstimationRequested message)
         {
             _logger.LogInformation(
-                "Receiving new case number {caseNumber} with {imageNumber} image(s)",
+                "New case number received {caseNumber} with {imageNumber} image(s)",
                 message.CaseNumber,
                 message.ImageUrls.Count);
 
@@ -90,9 +90,9 @@ namespace Acheve.Application.ProcessManager.Handlers
         public async Task Handle(ImageDownloaded message)
         {
             _logger.LogInformation(
-                "Receiving downloaded image for case number {caseNumber}. ImageId: {id}",
-                message.CaseNumber,
-                message.ImageId);
+                "Image {imageId} is available for case number {caseNumber}",
+                message.ImageId,
+                message.CaseNumber);
 
             var currentImage = Data.Images.Single(x => x.Id == message.ImageId);
             currentImage.ImageTicket = message.ImageTicket;
@@ -110,9 +110,9 @@ namespace Acheve.Application.ProcessManager.Handlers
         public async Task Handle(UnableToDownloadImage message)
         {
             _logger.LogWarning(
-                "Unable to download image for case number {caseNumber}. ImageId: {id}",
-                message.CaseNumber,
-                message.ImageId);
+                "Unable to get image {imageId} for case number {caseNumber}",
+                message.ImageId,
+                message.CaseNumber);
 
             var currentImage = Data.Images.Single(x => x.Id == message.ImageId);
 
@@ -155,9 +155,9 @@ namespace Acheve.Application.ProcessManager.Handlers
         public async Task Handle(ImageProcessed message)
         {
             _logger.LogInformation(
-                "Receiving processed image for case number {caseNumber}. ImageId: {id}",
-                message.CaseNumber,
-                message.ImageId);
+                "Image {imageId} has been processed for case number {caseNumber}",
+                message.ImageId,
+                message.CaseNumber);
 
             var currentImage = Data.Images.Single(x => x.Id == message.ImageId);
             currentImage.MetadataTicket = message.MetadataTicket;
@@ -168,9 +168,10 @@ namespace Acheve.Application.ProcessManager.Handlers
         public async Task Handle(UnableToProcessImage message)
         {
             _logger.LogWarning(
-                "Unable to receive processed image for case number {caseNumber}. ImageId: {id}",
-                message.CaseNumber,
-                message.ImageId);
+                "Unable to get image {imageId} information for case number {caseNumber}",
+
+                message.ImageId,
+                message.CaseNumber);
 
             var currentImage = Data.Images.Single(x => x.Id == message.ImageId);
             currentImage.MetadataError = message.Error;
@@ -186,9 +187,9 @@ namespace Acheve.Application.ProcessManager.Handlers
             if (currentImage.Processed)
             {
                 _logger.LogInformation(
-                    "Awaiting external image processing message received but image already processed. Case number {caseNumber}, ImageId {imageId}",
-                    message.CaseNumber,
-                    message.ImageId);
+                    "Awaiting image {imageId} to be processed. Case number {caseNumber}",
+                    message.ImageId,
+                    message.CaseNumber);
 
                 return;
             }
@@ -196,9 +197,9 @@ namespace Acheve.Application.ProcessManager.Handlers
             if (currentImage.ProcessedWaits >= CaseImage.MaxProcessedWaits)
             {
                 _logger.LogWarning(
-                    "Unable to receive external image for case number {caseNumber}. ImageId: {id}",
-                    message.CaseNumber,
-                    message.ImageId);
+                    "Unable to get image {imageId} information in the expected period for case number {caseNumber}",
+                    message.ImageId,
+                    message.CaseNumber);
 
                 Data.State = EstimationStates.StuckWaitingForExternalImagesToBeProcessed;
 
@@ -213,9 +214,9 @@ namespace Acheve.Application.ProcessManager.Handlers
                 currentImage.ProcessedWaits += 1;
 
                 _logger.LogInformation(
-                    "Still waiting to receive processed image for case number {caseNumber}. ImageId: {id}",
-                    message.CaseNumber,
-                    message.ImageId);
+                    "Still waiting to receive image {imageId} information for case number {caseNumber}",
+                    message.ImageId,
+                    message.CaseNumber);
 
                 await _bus.DeferLocal(
                     CaseImage.ProcessedWaitTime,
@@ -270,7 +271,7 @@ namespace Acheve.Application.ProcessManager.Handlers
                     {
                         CaseNumber = Data.CaseNumber,
                         CallbackUri = Data.CallbackUrl,
-                        Reason = "We can not download any provided images"
+                        Reason = "We can not get information from any provided images"
                     });
                 }
             }
@@ -279,7 +280,7 @@ namespace Acheve.Application.ProcessManager.Handlers
         public async Task Handle(EstimationCompleted message)
         {
             _logger.LogInformation(
-                "Receiving estimation complete for case number {caseNumber}.",
+                "Estimation received for case number {caseNumber}",
                 message.CaseNumber);
 
             Data.EstimationTicket = message.EstimationTicket;
@@ -328,7 +329,7 @@ namespace Acheve.Application.ProcessManager.Handlers
             if (Data.State > EstimationStates.EstimationReady)
             {
                 _logger.LogInformation(
-                    "Awaiting external estimation message received but estimation already received for case number {caseNumber}",
+                    "Awaiting external estimation for case number {caseNumber}",
                     message.CaseNumber);
 
                 return;
@@ -366,7 +367,7 @@ namespace Acheve.Application.ProcessManager.Handlers
         public async Task Handle(NotificationCompleted message)
         {
             _logger.LogInformation(
-                "Callback notification complete for case number {caseNumber}.",
+                "Case number {caseNumber} estimation successfully notified.",
                 message.CaseNumber);
 
             Data.State = EstimationStates.ClientNotified;
@@ -384,7 +385,7 @@ namespace Acheve.Application.ProcessManager.Handlers
         public async Task Handle(UnableToNotify message)
         {
             _logger.LogWarning(
-                "Callback notification error for case number {caseNumber}.",
+                "Unable to notify case number {caseNumber} estimation",
                 message.CaseNumber);
 
             Data.State = EstimationStates.NotificationError;

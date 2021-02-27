@@ -34,7 +34,7 @@ namespace Acheve.Application.EstimationProcessor.Handlers
         public async Task Handle(AllImagesProcessed message)
         {
             _logger.LogInformation(
-                "Receiving case to estimate with number {caseNumber}.",
+                "New request for external estimation. Case number: {caseNumber}.",
                 message.CaseNumber);
 
             var client = _httpClientFactory.CreateClient("estimations");
@@ -57,7 +57,7 @@ namespace Acheve.Application.EstimationProcessor.Handlers
             catch (Exception e)
             {
                 _logger.LogWarning(
-                    "Case number {caseNumber} process error. {externalEstimationError}",
+                    "Error getting estimation for case number {caseNumber}. {externalEstimationError}",
                     message.CaseNumber,
                     e.Message);
 
@@ -74,7 +74,7 @@ namespace Acheve.Application.EstimationProcessor.Handlers
             if (response.IsSuccessStatusCode)
             {
                 _logger.LogInformation(
-                    "Case {caseNumber} sent to external estimation successfully.",
+                    "Estimation successful for case {caseNumber}.",
                     message.CaseNumber);
 
                 await _bus.Send(new AwaitExternalEstimationToBeProcessed(
@@ -83,7 +83,7 @@ namespace Acheve.Application.EstimationProcessor.Handlers
             else
             {
                 _logger.LogWarning(
-                    "Error sending the case number {caseNumber} to external estimation: StatusCode: {StatusCode}",
+                    "Error getting estimation for case number {caseNumber}: StatusCode: {StatusCode}",
                     message.CaseNumber,
                     response.StatusCode);
 

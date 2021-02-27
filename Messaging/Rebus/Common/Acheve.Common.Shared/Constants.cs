@@ -2,7 +2,7 @@
 {
     public static class Constants
     {
-        public const string ApplicationInsightsInstrumentationKey = "bdadaa14-8039-4aba-a637-6a03ac45cea1";
+        public const string ApplicationInsightsInstrumentationKey = "723add8f-4d10-4dc7-ae9f-0a0a00e81c35";
 
         public static class Azure
         {
@@ -10,12 +10,12 @@
             {
                 // RootManageSharedAccessKey for the demo purposes. Then you can tell rebus to use access policies without management permissions
                 // so Rebus does not try to create the queues
-                public const string ConnectionString = "Endpoint=sb://demo-rebus.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=7AjtLEq6d9EFVdChtrZ6DRHfe+LseqrLsUV4hJE9YRc=";
+                public const string ConnectionString = "Endpoint=sb://rebus-messaging.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=S0O5KH2TMkCravMwqHOJod++fkQ6UW/ozL/5tY5TFWE=";
             }
 
             public static class Storage
             {
-                public const string ConnectionString = "DefaultEndpointsProtocol=https;AccountName=demorebus;AccountKey=6eJZ0PI5lF74pYQnSm1qQTBfJwZoo3HhL2jysdE2Og/CR+R8BUayK0QXwupE23VwZBs7qgDxKM9HSWm6OaI2fA==;EndpointSuffix=core.windows.net";
+                public const string ConnectionString = "DefaultEndpointsProtocol=https;AccountName=rebusmessaging;AccountKey=OcUHSvmMzi5083qw/yMQTiUKTHGkV/l9ibM4rioJlM5g0HWbmqCSwRGOT4UcXvmZMQyb8rxZQ7gNEe3OuDkqsg==;EndpointSuffix=core.windows.net";
                 public const string DataBusContainer = "databus";
             }
         }
@@ -46,7 +46,7 @@
             public const string ImageProcess = "imageprocess";
             public const string ExternalEstimations = "externalestimations";
             public const string CallbackNotifications = "callbacknotifications";
-            public const string StateHolder = "StateHolder";
+            public const string StateHolder = "stateholder";
         }
 
         public static class FileSystem

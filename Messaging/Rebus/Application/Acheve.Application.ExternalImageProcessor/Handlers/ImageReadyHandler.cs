@@ -33,7 +33,7 @@ namespace Acheve.Application.ExternalImageProcessor.Handlers
         public async Task Handle(ImageReady message)
         {
             _logger.LogInformation(
-                "Receiving image to process for case number {caseNumber}. ImageId: {id}, ImageTicket {ticket}",
+                "New request to process image for case number {caseNumber}. ImageId: {imageId}, ImageTicket {ticket}",
                 message.CaseNumber,
                 message.ImageId,
                 message.ImageTicket);
@@ -59,9 +59,9 @@ namespace Acheve.Application.ExternalImageProcessor.Handlers
             catch (Exception e)
             {
                 _logger.LogWarning(
-                    "Image {id} for case number {caseNumber} process error. {imageProcessError}",
+                    "Process error for image {imageId} for case number {caseNumber}. {imageProcessError}",
+                    message.ImageId, 
                     message.CaseNumber,
-                    message.ImageId,
                     e.Message);
 
                 await _bus.Send(new UnableToProcessImage
@@ -78,7 +78,7 @@ namespace Acheve.Application.ExternalImageProcessor.Handlers
             if (response.IsSuccessStatusCode)
             {
                 _logger.LogInformation(
-                    "Image {id} for case number {caseNumber} sent to process successfully.",
+                    "Process successful for Image {imageId} for case number {caseNumber}",
                     message.ImageId,
                     message.CaseNumber);
 
@@ -89,7 +89,7 @@ namespace Acheve.Application.ExternalImageProcessor.Handlers
             else
             {
                 _logger.LogWarning(
-                    "Error sending to process image {id} for case number {caseNumber}: StatusCode: {StatusCode}",
+                    "Process error for image {imageId} for case number {caseNumber}: StatusCode: {StatusCode}",
                     message.ImageId,
                     message.CaseNumber,
                     response.StatusCode);

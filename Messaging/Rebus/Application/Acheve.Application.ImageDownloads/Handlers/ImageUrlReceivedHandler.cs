@@ -24,7 +24,7 @@ namespace Acheve.Application.ImageDownloads.Handlers
         public async Task Handle(ImageUrlReceived message)
         {
             _logger.LogInformation(
-                "Receiving image to download for case number {caseNumber}. ImageId: {id}, ImageUrl {url}",
+                "New request to download image: case number {caseNumber}. ImageId: {imageId}, ImageUrl {url}",
                 message.CaseNumber,
                 message.ImageId,
                 message.ImageUrl);
@@ -36,7 +36,7 @@ namespace Acheve.Application.ImageDownloads.Handlers
                 var stream = await client.GetStreamAsync(message.ImageUrl);
 
                 _logger.LogInformation(
-                    "Image {id} for case number {caseNumber} downloaded successfully.",
+                    "Download successfully for image {imageId} for case number {caseNumber} .",
                     message.ImageId,
                     message.CaseNumber);
 
@@ -52,7 +52,7 @@ namespace Acheve.Application.ImageDownloads.Handlers
             catch (Exception e)
             {
                 _logger.LogWarning(
-                    "Image {id} for case number {caseNumber} download error. {downloadError}",
+                    "Download error for image {imageId} for case number {caseNumber}. {downloadError}",
                     message.CaseNumber,
                     message.ImageId,
                     message.ImageUrl,
