@@ -1,12 +1,10 @@
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
-using Ocelot.Middleware.Multiplexer;
-using OpenTracing.Contrib.NetCore.CoreFx;
+using OpenTracing.Contrib.NetCore.Configuration;
 using Shared;
 
 namespace ApiGateway
@@ -28,7 +26,7 @@ namespace ApiGateway
             services.AddOcelot();
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {

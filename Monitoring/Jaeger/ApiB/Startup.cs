@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using OpenTracing.Contrib.NetCore.CoreFx;
+using OpenTracing.Contrib.NetCore.Configuration;
 using Shared;
 
 namespace ApiB
