@@ -1,0 +1,29 @@
+version: '3.4'
+
+services:
+  rabbit:
+    image: rabbitmq:3-management
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+
+  database:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    ports:
+      - "1433:1433"
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=P@ssw0rd
+
+  acheve.cap.api:
+    image: ${DOCKER_REGISTRY-}achevecapapi
+    build:
+      context: .
+      dockerfile: Acheve.Cap.Api/Dockerfile
+
+  consumer:
+    image: ${DOCKER_REGISTRY-}consumer
+    build:
+      context: .
+      dockerfile: Consumer/Dockerfile
+
