@@ -26,7 +26,8 @@ namespace Acheve.Application.StateHolder
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddApplicationInsightsTelemetry(Constants.ApplicationInsightsInstrumentationKey);
+            services.AddApplicationInsightsTelemetry(config =>
+                config.ConnectionString = Constants.ApplicationInsightsInstrumentationKey); 
             services.AddSingleton<ITelemetryInitializer>(sp => new ServiceNameInitializer(Constants.Services.StateHolder));
 
             services.Configure<ServicesConfiguration>(Configuration.GetSection("Service"));
@@ -56,7 +57,7 @@ namespace Acheve.Application.StateHolder
                 app.UseDeveloperExceptionPage();
             }
 
-            app.ApplicationServices.UseRebus();
+            app.ApplicationServices.StartRebus();
 
             app.UseRouting();
 

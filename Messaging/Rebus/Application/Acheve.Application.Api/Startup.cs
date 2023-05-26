@@ -30,7 +30,8 @@ namespace Acheve.Application.Api
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddApplicationInsightsTelemetry(Constants.ApplicationInsightsInstrumentationKey);
+            services.AddApplicationInsightsTelemetry(config =>
+                config.ConnectionString= Constants.ApplicationInsightsInstrumentationKey);
             services.AddSingleton<ITelemetryInitializer>(sp => new ServiceNameInitializer(Constants.Services.Api));
 
             services.Configure<ServicesConfiguration>(Configuration.GetSection("Service"));
@@ -79,7 +80,7 @@ namespace Acheve.Application.Api
                 app.UseDeveloperExceptionPage();
             }
 
-            app.ApplicationServices.UseRebus();
+            app.ApplicationServices.StartRebus();
 
             app.UseRouting();
 

@@ -16,7 +16,7 @@ using Rebus.Sagas.Exclusive;
 using Rebus.ServiceProvider;
 using Serilog;
 using Serilog.Events;
-using Serilog.Sinks.ApplicationInsights.Sinks.ApplicationInsights.TelemetryConverters;
+using Serilog.Sinks.ApplicationInsights.TelemetryConverters;
 
 namespace Acheve.Application.ProcessManager
 {
@@ -51,7 +51,8 @@ namespace Acheve.Application.ProcessManager
                 })
                 .ConfigureServices((hostContext, services) =>
                 {
-                    services.AddApplicationInsightsTelemetryWorkerService(Constants.ApplicationInsightsInstrumentationKey);
+                    services.AddApplicationInsightsTelemetryWorkerService(config => 
+                        config.ConnectionString = Constants.ApplicationInsightsInstrumentationKey);
                     services.AddSingleton<ITelemetryInitializer>(sp => new ServiceNameInitializer(Constants.Services.ProcessManagerService));
 
                     services.Configure<ServicesConfiguration>(hostContext.Configuration.GetSection("Service"));

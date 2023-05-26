@@ -14,7 +14,7 @@ using Rebus.Routing.TypeBased;
 using Rebus.ServiceProvider;
 using Serilog;
 using Serilog.Events;
-using Serilog.Sinks.ApplicationInsights.Sinks.ApplicationInsights.TelemetryConverters;
+using Serilog.Sinks.ApplicationInsights.TelemetryConverters;
 
 namespace Acheve.Application.ExternalImageProcessor
 {
@@ -49,7 +49,8 @@ namespace Acheve.Application.ExternalImageProcessor
                 })
                 .ConfigureServices((hostContext, services) =>
                 {
-                    services.AddApplicationInsightsTelemetryWorkerService(Constants.ApplicationInsightsInstrumentationKey);
+                    services.AddApplicationInsightsTelemetryWorkerService(config => 
+                        config.ConnectionString = Constants.ApplicationInsightsInstrumentationKey);
                     services.AddSingleton<ITelemetryInitializer>(sp => new ServiceNameInitializer(Constants.Services.ImageProcessService));
 
                     services.Configure<ServicesConfiguration>(hostContext.Configuration.GetSection("Service"));

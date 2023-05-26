@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
+using Rebus.Config;
 using Rebus.ServiceProvider;
 
 namespace Acheve.Application.CallbackNotifier
@@ -10,7 +11,7 @@ namespace Acheve.Application.CallbackNotifier
     {
         public Worker(IServiceProvider serviceProvider)
         {
-            serviceProvider.UseRebus();
+            serviceProvider.StartRebus();
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)

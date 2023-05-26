@@ -53,9 +53,8 @@ namespace Acheve.Application.ImageDownloads.Handlers
             {
                 _logger.LogWarning(
                     "Download error for image {imageId} for case number {caseNumber}. {downloadError}",
-                    message.CaseNumber,
                     message.ImageId,
-                    message.ImageUrl,
+                    message.CaseNumber,
                     e.Message);
 
                 await _bus.Send(new UnableToDownloadImage
