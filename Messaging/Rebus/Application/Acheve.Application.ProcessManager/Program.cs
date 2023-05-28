@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using Acheve.Application.ProcessManager.Handlers;
 using Acheve.Common.Messages;
 using Acheve.Common.Messages.Tracing;
@@ -43,7 +44,7 @@ namespace Acheve.Application.ProcessManager
                         .Enrich.WithProperty("Application", Constants.Services.ProcessManagerService)
                         .WriteTo.Console()
                         .WriteTo.ApplicationInsights(
-                            Constants.Azure.Apm.ApplicationInsightsInstrumentationKey, 
+                            Constants.Azure.Apm.ConnectionString, 
                             new TraceTelemetryConverter())
                         .CreateLogger();
 
@@ -54,7 +55,7 @@ namespace Acheve.Application.ProcessManager
                 .ConfigureServices((hostContext, services) =>
                 {
                     services.AddApplicationInsightsTelemetryWorkerService(config => 
-                        config.ConnectionString = Constants.Azure.Apm.ApplicationInsightsInstrumentationKey);
+                        config.ConnectionString = Constants.Azure.Apm.ConnectionString);
                     services.AddSingleton<ITelemetryInitializer>(sp => new ServiceNameInitializer(Constants.Services.ProcessManagerService));
 
                     services.Configure<ServicesConfiguration>(hostContext.Configuration.GetSection("Service"));
@@ -64,27 +65,38 @@ namespace Acheve.Application.ProcessManager
                     services.AutoRegisterHandlersFromAssemblyOf<EstimationSaga>();
 
                     //Configure Rebus
-                    services.AddRebus(configure => configure
-                        .Options(o =>
-                        {
-                            o.LogPipeline(verbose: true);
-                            o.UseDistributeTracingFlow();
-                        })
-                        .Logging(l => l.Serilog())
-                        .Sagas(s =>
-                        {
-                            s.EnforceExclusiveAccess();
-                            s.UseFilesystem(Constants.FileSystem.SagasPath);
-                        })
-                        .DataBus(d => d.StoreInBlobStorage(Constants.Azure.Storage.ConnectionString, Constants.Azure.Storage.DataBusContainer))
-                        .Transport(t => t.UseAzureServiceBus(Constants.Azure.ServiceBus.ConnectionString, Constants.Queues.ProcessManager))
-                        .Routing(r => r.TypeBased()
-                            .Map<ImageUrlReceived>(Constants.Queues.ImageDownloads)
-                            .Map<ImageReady>(Constants.Queues.ImageProcess)
-                            .Map<AllImagesProcessed>(Constants.Queues.ExternalEstimations)
-                            .Map<EstimationReady>(Constants.Queues.CallbackNotifications)
-                            .Map<EstimationError>(Constants.Queues.CallbackNotifications)
-                            .Map<EstimationStateChanged>(Constants.Queues.StateHolder)));
+                    services.AddRebus(
+                        configure: configurer => configurer
+                            .Options(o =>
+                            {
+                                o.LogPipeline(verbose: true);
+                                o.UseDistributeTracingFlow();
+                            })
+                            .Logging(l => l.Serilog())
+                            .Sagas(s =>
+                            {
+                                s.EnforceExclusiveAccess();
+                                s.UseFilesystem(Constants.FileSystem.SagasPath);
+                            })
+                            .DataBus(d => d.StoreInBlobStorage(Constants.Azure.Storage.ConnectionString, Constants.Azure.Storage.DataBusContainer))
+                            .Transport(t =>
+                            {
+                                t.UseAzureServiceBus(
+                                    Constants.Azure.ServiceBus.ConnectionString, 
+                                    Constants.Queues.ProcessManager);
+                                t.UseNativeHeaders();
+                                t.UseNativeDeadlettering();
+                            })
+                            .Routing(r => r.TypeBased()
+                                .Map<ImageUrlReceived>(Constants.Queues.ImageDownloads)
+                                .Map<ImageReady>(Constants.Queues.ImageProcess)
+                                .Map<AllImagesProcessed>(Constants.Queues.ExternalEstimations)
+                                .Map<EstimationReady>(Constants.Queues.CallbackNotifications)
+                                .Map<EstimationError>(Constants.Queues.CallbackNotifications)
+                                .Map<EstimationStateChanged>(Constants.Queues.StateHolder)),
+                        isDefaultBus: true,
+                        onCreated: async bus => { await Task.Delay(0); },
+                        startAutomatically: true);
 
                     services.AddHostedService<Worker>();
                 });

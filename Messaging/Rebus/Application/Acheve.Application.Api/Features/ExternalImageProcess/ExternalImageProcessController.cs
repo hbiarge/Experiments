@@ -31,7 +31,10 @@ namespace Acheve.Application.Api.Features.ExternalImageProcess
                 url: Request.ToString(), 
                 logger: _logger);
 
-            _logger.LogInformation("Response received from the external image processor service for case number {caseNumber} and image {imageId}", caseNumber, imageId);
+            _logger.LogInformation(
+                "Response received from the external image processor service for case number {caseNumber} and image {imageId}", 
+                caseNumber, 
+                imageId);
 
             var source = new MemoryStream(new byte[1024]);
             source.Write(Encoding.UTF8.GetBytes(request.Metadata));

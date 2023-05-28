@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Acheve.Common.Messages;
 using Microsoft.AspNetCore.Mvc;
@@ -42,6 +43,8 @@ namespace Acheve.Application.Api.Features.Estimations
         [HttpPost]
         public async Task<ActionResult<NewEstimationResponse>> ProcessNewEstimation([FromBody]NewEstimationRequest request)
         {
+            var currentActivity = Activity.Current;
+
             var message = new EstimationRequested
             {
                 CaseNumber = Guid.NewGuid(),
@@ -52,7 +55,11 @@ namespace Acheve.Application.Api.Features.Estimations
 
             await _bus.Send(message);
 
-            return Accepted(new NewEstimationResponse { Token = message.CaseNumber.ToString("D") });
+            return Accepted(new NewEstimationResponse 
+            { 
+                Token = message.CaseNumber.ToString("D"),
+                OperationId = currentActivity.RootId
+            });
         }
     }
 }

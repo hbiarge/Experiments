@@ -12,6 +12,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Rebus.Config;
 using Rebus.ServiceProvider;
+using System.Threading.Tasks;
 
 namespace Acheve.Application.StateHolder
 {
@@ -27,7 +28,7 @@ namespace Acheve.Application.StateHolder
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddApplicationInsightsTelemetry(config =>
-                config.ConnectionString = Constants.Azure.Apm.ApplicationInsightsInstrumentationKey); 
+                config.ConnectionString = Constants.Azure.Apm.ConnectionString); 
             services.AddSingleton<ITelemetryInitializer>(sp => new ServiceNameInitializer(Constants.Services.StateHolder));
 
             services.Configure<ServicesConfiguration>(Configuration.GetSection("Service"));
@@ -40,14 +41,25 @@ namespace Acheve.Application.StateHolder
             // Automatically register all handlers from the assembly of a given type...
             services.AutoRegisterHandlersFromAssemblyOf<EstimationStateChangedHandler>();
 
-            services.AddRebus(configure => configure
-                .Options(o =>
-                {
-                    o.LogPipeline(verbose: true);
-                    o.UseDistributeTracingFlow();
-                })
-                .Logging(l => l.Serilog())
-                .Transport(t => t.UseAzureServiceBus(Constants.Azure.ServiceBus.ConnectionString, Constants.Queues.StateHolder)));
+            services.AddRebus(
+                configure: configurer => configurer
+                    .Options(o =>
+                    {
+                        o.LogPipeline(verbose: true);
+                        o.UseDistributeTracingFlow();
+                    })
+                    .Logging(l => l.Serilog())
+                    .Transport(t =>
+                    {
+                        t.UseAzureServiceBus(
+                            Constants.Azure.ServiceBus.ConnectionString, 
+                            Constants.Queues.StateHolder);
+                        t.UseNativeHeaders();
+                        t.UseNativeDeadlettering();
+                    }),
+                isDefaultBus: true,
+                onCreated: async bus => { await Task.Delay(0); },
+                startAutomatically: true);
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -56,8 +68,6 @@ namespace Acheve.Application.StateHolder
             {
                 app.UseDeveloperExceptionPage();
             }
-
-            app.ApplicationServices.StartRebus();
 
             app.UseRouting();
 

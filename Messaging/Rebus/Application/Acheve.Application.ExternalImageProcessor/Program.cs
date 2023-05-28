@@ -41,7 +41,7 @@ namespace Acheve.Application.ExternalImageProcessor
                         .Enrich.WithProperty("Application", Constants.Services.ImageProcessService)
                         .WriteTo.Console()
                         .WriteTo.ApplicationInsights(
-                            Constants.Azure.Apm.ApplicationInsightsInstrumentationKey, 
+                            Constants.Azure.Apm.ConnectionString, 
                             new TraceTelemetryConverter())
                         .CreateLogger();
 
@@ -52,7 +52,7 @@ namespace Acheve.Application.ExternalImageProcessor
                 .ConfigureServices((hostContext, services) =>
                 {
                     services.AddApplicationInsightsTelemetryWorkerService(config => 
-                        config.ConnectionString = Constants.Azure.Apm.ApplicationInsightsInstrumentationKey);
+                        config.ConnectionString = Constants.Azure.Apm.ConnectionString);
                     services.AddSingleton<ITelemetryInitializer>(sp => new ServiceNameInitializer(Constants.Services.ImageProcessService));
 
                     services.Configure<ServicesConfiguration>(hostContext.Configuration.GetSection("Service"));
@@ -74,7 +74,14 @@ namespace Acheve.Application.ExternalImageProcessor
                         })
                         .Logging(l => l.Serilog())
                         .DataBus(d => d.StoreInBlobStorage(Constants.Azure.Storage.ConnectionString, Constants.Azure.Storage.DataBusContainer))
-                        .Transport(t => t.UseAzureServiceBus(Constants.Azure.ServiceBus.ConnectionString, Constants.Queues.ImageProcess))
+                        .Transport(t =>
+                        {
+                            t.UseAzureServiceBus(
+                                Constants.Azure.ServiceBus.ConnectionString, 
+                                Constants.Queues.ImageProcess);
+                            t.UseNativeHeaders();
+                            t.UseNativeDeadlettering();
+                        })
                         .Routing(r => r.TypeBased()
                             .Map<ImageProcessed>(Constants.Queues.ProcessManager)
                             .Map<UnableToProcessImage>(Constants.Queues.ProcessManager)

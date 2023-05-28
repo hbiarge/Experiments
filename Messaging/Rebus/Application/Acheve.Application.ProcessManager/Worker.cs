@@ -2,8 +2,6 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
-using Rebus.Config;
-using Rebus.ServiceProvider;
 
 namespace Acheve.Application.ProcessManager
 {
@@ -11,7 +9,6 @@ namespace Acheve.Application.ProcessManager
     {
         public Worker(IServiceProvider serviceProvider)
         {
-            serviceProvider.StartRebus();
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)

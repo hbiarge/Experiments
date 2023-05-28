@@ -41,7 +41,7 @@ namespace Acheve.Application.ImageDownloads
                         .Enrich.WithProperty("Application", Constants.Services.ImageDownloadService)
                         .WriteTo.Console()
                         .WriteTo.ApplicationInsights(
-                            Constants.Azure.Apm.ApplicationInsightsInstrumentationKey, 
+                            Constants.Azure.Apm.ConnectionString, 
                             new TraceTelemetryConverter())
                         .CreateLogger();
 
@@ -52,7 +52,7 @@ namespace Acheve.Application.ImageDownloads
                 .ConfigureServices((hostContext, services) =>
                 {
                     services.AddApplicationInsightsTelemetryWorkerService(config => 
-                        config.ConnectionString = Constants.Azure.Apm.ApplicationInsightsInstrumentationKey);
+                        config.ConnectionString = Constants.Azure.Apm.ConnectionString);
                     services.AddSingleton<ITelemetryInitializer>(sp => new ServiceNameInitializer(Constants.Services.ImageDownloadService));
 
                     services.Configure<ServicesConfiguration>(hostContext.Configuration.GetSection("Service"));
@@ -74,7 +74,14 @@ namespace Acheve.Application.ImageDownloads
                         })
                         .Logging(l => l.Serilog())
                         .DataBus(d => d.StoreInBlobStorage(Constants.Azure.Storage.ConnectionString, Constants.Azure.Storage.DataBusContainer))
-                        .Transport(t => t.UseAzureServiceBus(Constants.Azure.ServiceBus.ConnectionString, Constants.Queues.ImageDownloads))
+                        .Transport(t =>
+                        {
+                            t.UseAzureServiceBus(
+                                Constants.Azure.ServiceBus.ConnectionString, 
+                                Constants.Queues.ImageDownloads);
+                            t.UseNativeHeaders();
+                            t.UseNativeDeadlettering();
+                        })
                         .Routing(r => r.TypeBased()
                             .Map<ImageDownloaded>(Constants.Queues.ProcessManager)
                             .Map<UnableToDownloadImage>(Constants.Queues.ProcessManager)));

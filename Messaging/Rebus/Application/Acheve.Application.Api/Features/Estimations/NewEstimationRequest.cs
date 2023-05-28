@@ -6,10 +6,10 @@ namespace Acheve.Application.Api.Features.Estimations
     {
         [Required]
         [Url]
-        public string CallBackUri { get; set; }
+        public string CallBackUri { get; init; }
 
         [Required]
         [MaxLength(10)]
-        public string[] ImageUrls { get; set; }
+        public string[] ImageUrls { get; init; }
     }
 }

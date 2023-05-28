@@ -1,5 +1,6 @@
 using System;
 using System.Net.Http;
+using System.Threading.Tasks;
 using Acheve.Common.Messages;
 using Acheve.Common.Messages.Tracing;
 using Acheve.Common.Shared;
@@ -31,7 +32,7 @@ namespace Acheve.Application.Api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddApplicationInsightsTelemetry(config =>
-                config.ConnectionString= Constants.Azure.Apm.ApplicationInsightsInstrumentationKey);
+                config.ConnectionString= Constants.Azure.Apm.ConnectionString);
             services.AddSingleton<ITelemetryInitializer>(sp => new ServiceNameInitializer(Constants.Services.Api));
 
             services.Configure<ServicesConfiguration>(Configuration.GetSection("Service"));
@@ -58,19 +59,28 @@ namespace Acheve.Application.Api
                 .AddPolicyHandler(PollyDefaults.RetryPolicyBuilder)
                 .AddPolicyHandler(PollyDefaults.TimeoutPolicyBuilder);
 
-            services.AddRebus(configure => configure
-                .Options(o =>
-                {
-                    o.LogPipeline(verbose: true);
-                    o.UseDistributeTracingFlow();
-                })
-                .Logging(l => l.Serilog())
-                .DataBus(d => d.StoreInBlobStorage(Constants.Azure.Storage.ConnectionString, Constants.Azure.Storage.DataBusContainer))
-                .Transport(t => t.UseAzureServiceBusAsOneWayClient(Constants.Azure.ServiceBus.ConnectionString))
-                .Routing(r => r.TypeBased()
-                    .Map<EstimationRequested>(Constants.Queues.ProcessManager)
-                    .Map<ImageProcessed>(Constants.Queues.ProcessManager)
-                    .Map<EstimationCompleted>(Constants.Queues.ProcessManager)));
+            services.AddRebus(
+                configure: configurer => configurer
+                    .Options(o =>
+                    {
+                        o.LogPipeline(verbose: true);
+                        o.UseDistributeTracingFlow();
+                    })
+                    .Logging(l => l.Serilog())
+                    .DataBus(d => d.StoreInBlobStorage(Constants.Azure.Storage.ConnectionString, Constants.Azure.Storage.DataBusContainer))
+                    .Transport(t =>
+                    {
+                        t.UseAzureServiceBusAsOneWayClient(Constants.Azure.ServiceBus.ConnectionString);
+                        t.UseNativeHeaders();
+                        t.UseNativeDeadlettering();
+                    })
+                    .Routing(r => r.TypeBased()
+                        .Map<EstimationRequested>(Constants.Queues.ProcessManager)
+                        .Map<ImageProcessed>(Constants.Queues.ProcessManager)
+                        .Map<EstimationCompleted>(Constants.Queues.ProcessManager)),
+                isDefaultBus: true,
+                onCreated: async bus => await Task.Delay(0),
+                startAutomatically: true) ;
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -79,8 +89,6 @@ namespace Acheve.Application.Api
             {
                 app.UseDeveloperExceptionPage();
             }
-
-            app.ApplicationServices.StartRebus();
 
             app.UseRouting();
 

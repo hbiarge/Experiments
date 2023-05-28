@@ -36,7 +36,7 @@ namespace Acheve.Application.ImageDownloads.Handlers
                 var stream = await client.GetStreamAsync(message.ImageUrl);
 
                 _logger.LogInformation(
-                    "Download successfully for image {imageId} for case number {caseNumber} .",
+                    "Download successfully for image {imageId} for case number {caseNumber}.",
                     message.ImageId,
                     message.CaseNumber);
 

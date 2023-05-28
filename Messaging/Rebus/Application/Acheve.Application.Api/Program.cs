@@ -4,7 +4,9 @@ using Acheve.Common.Shared;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Rebus.Config;
 using Serilog;
+using Serilog.Enrichers.Span;
 using Serilog.Events;
 using Serilog.Sinks.ApplicationInsights.TelemetryConverters;
 
@@ -32,9 +34,11 @@ namespace Acheve.Application.Api
                         .MinimumLevel.Override("Microsoft.AspNetCore.Hosting.Diagnostics", LogEventLevel.Information)
                         .MinimumLevel.Override("System", LogEventLevel.Information)
                         .Enrich.WithProperty("Application", Constants.Services.Api)
+                        .Enrich.FromLogContext()
+                        .Enrich.WithSpan()
                         .WriteTo.Console()
                         .WriteTo.ApplicationInsights(
-                            Constants.Azure.Apm.ApplicationInsightsInstrumentationKey, 
+                            Constants.Azure.Apm.ConnectionString, 
                             new TraceTelemetryConverter())
                         .CreateLogger();
 

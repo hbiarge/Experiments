@@ -380,6 +380,10 @@ namespace Acheve.Application.ProcessManager.Handlers
 
             MarkAsComplete();
             await CleanupDataBus();
+
+            _logger.LogInformation(
+                "Case number {caseNumber} finished.",
+                message.CaseNumber);
         }
 
         public async Task Handle(UnableToNotify message)
@@ -398,6 +402,10 @@ namespace Acheve.Application.ProcessManager.Handlers
 
             MarkAsComplete();
             await CleanupDataBus();
+
+            _logger.LogInformation(
+                "Case number {caseNumber} finished.",
+                message.CaseNumber);
         }
 
         private async Task CleanupDataBus()

@@ -36,7 +36,7 @@ namespace Acheve.Application.StateHolder
                         .Enrich.WithProperty("Application", Constants.Services.StateHolder)
                         .WriteTo.Console()
                         .WriteTo.ApplicationInsights(
-                            Constants.Azure.Apm.ApplicationInsightsInstrumentationKey, 
+                            Constants.Azure.Apm.ConnectionString, 
                             new TraceTelemetryConverter())
                         .CreateLogger();
 

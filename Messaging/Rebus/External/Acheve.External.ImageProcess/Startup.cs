@@ -20,9 +20,9 @@ namespace Acheve.External.ImageProcess
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddApplicationInsightsTelemetry(config =>
-                config.ConnectionString = Constants.Azure.Apm.ApplicationInsightsInstrumentationKey); 
-            services.AddSingleton<ITelemetryInitializer>(sp => new ServiceNameInitializer(Constants.Services.External.ImageProcess));
+            //services.AddApplicationInsightsTelemetry(config =>
+            //    config.ConnectionString = Constants.Azure.Apm.ConnectionString); 
+            //services.AddSingleton<ITelemetryInitializer>(sp => new ServiceNameInitializer(Constants.Services.External.ImageProcess));
 
             services.Configure<ServicesConfiguration>(Configuration.GetSection("Service"));
             services.AddSingleton<IPostConfigureOptions<ServicesConfiguration>, ServicesPostConfiguration>();

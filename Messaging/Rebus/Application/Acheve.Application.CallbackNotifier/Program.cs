@@ -41,7 +41,7 @@ namespace Acheve.Application.CallbackNotifier
                         .Enrich.WithProperty("Application", Constants.Services.NotificationService)
                         .WriteTo.Console()
                         .WriteTo.ApplicationInsights(
-                            Constants.Azure.Apm.ApplicationInsightsInstrumentationKey, 
+                            Constants.Azure.Apm.ConnectionString, 
                             new TraceTelemetryConverter())
                         .CreateLogger();
 
@@ -52,7 +52,7 @@ namespace Acheve.Application.CallbackNotifier
                 .ConfigureServices((hostContext, services) =>
                 {
                     services.AddApplicationInsightsTelemetryWorkerService(config => 
-                        config.ConnectionString = Constants.Azure.Apm.ApplicationInsightsInstrumentationKey);
+                        config.ConnectionString = Constants.Azure.Apm.ConnectionString);
                     services.AddSingleton<ITelemetryInitializer>(sp => new ServiceNameInitializer(Constants.Services.NotificationService));
 
                     services.Configure<ServicesConfiguration>(hostContext.Configuration.GetSection("Service"));
@@ -74,7 +74,13 @@ namespace Acheve.Application.CallbackNotifier
                         })
                         .Logging(l => l.Serilog())
                         .DataBus(d => d.StoreInBlobStorage(Constants.Azure.Storage.ConnectionString, Constants.Azure.Storage.DataBusContainer))
-                        .Transport(t => t.UseAzureServiceBus(Constants.Azure.ServiceBus.ConnectionString, Constants.Queues.CallbackNotifications))
+                        .Transport(t => {
+                            t.UseAzureServiceBus(
+                                Constants.Azure.ServiceBus.ConnectionString,
+                                Constants.Queues.CallbackNotifications);
+                            t.UseNativeHeaders();
+                            t.UseNativeDeadlettering();
+                        })
                         .Routing(r => r.TypeBased()
                             .Map<NotificationCompleted>(Constants.Queues.ProcessManager)
                             .Map<UnableToNotify>(Constants.Queues.ProcessManager)));

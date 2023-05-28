@@ -26,8 +26,9 @@ namespace Acheve.Application.CallbackNotifier.Handlers
         public async Task Handle(EstimationError message)
         {
             _logger.LogInformation(
-                "Receiving case number {caseNumber} to notify estimation error.",
-                message.CaseNumber);
+                "Receiving case number {caseNumber} to notify estimation error: {estimationError}.",
+                message.CaseNumber,
+                message.Reason);
 
             var client = _httpClientFactory.CreateClient("notifications");
             var contentString = System.Text.Json.JsonSerializer.Serialize(new

@@ -41,7 +41,7 @@ namespace Acheve.Application.EstimationProcessor
                         .Enrich.WithProperty("Application", Constants.Services.EstimationService)
                         .WriteTo.Console()
                         .WriteTo.ApplicationInsights(
-                            Constants.Azure.Apm.ApplicationInsightsInstrumentationKey, 
+                            Constants.Azure.Apm.ConnectionString, 
                             new TraceTelemetryConverter())
                         .CreateLogger();
 
@@ -52,7 +52,7 @@ namespace Acheve.Application.EstimationProcessor
                 .ConfigureServices((hostContext, services) =>
                 {
                     services.AddApplicationInsightsTelemetryWorkerService(config =>
-                        config.ConnectionString = Constants.Azure.Apm.ApplicationInsightsInstrumentationKey);
+                        config.ConnectionString = Constants.Azure.Apm.ConnectionString);
                     services.AddSingleton<ITelemetryInitializer>(sp => new ServiceNameInitializer(Constants.Services.EstimationService));
 
                     services.Configure<ServicesConfiguration>(hostContext.Configuration.GetSection("Service"));
@@ -74,7 +74,14 @@ namespace Acheve.Application.EstimationProcessor
                         })
                         .Logging(l => l.Serilog())
                         .DataBus(d => d.StoreInBlobStorage(Constants.Azure.Storage.ConnectionString, Constants.Azure.Storage.DataBusContainer))
-                        .Transport(t => t.UseAzureServiceBus(Constants.Azure.ServiceBus.ConnectionString, Constants.Queues.ExternalEstimations))
+                        .Transport(t =>
+                        {
+                            t.UseAzureServiceBus(
+                                Constants.Azure.ServiceBus.ConnectionString, 
+                                Constants.Queues.ExternalEstimations);
+                            t.UseNativeHeaders();
+                            t.UseNativeDeadlettering();
+                        })
                         .Routing(r => r.TypeBased()
                             .Map<EstimationCompleted>(Constants.Queues.ProcessManager)
                             .Map<UnableToEstimate>(Constants.Queues.ProcessManager)
