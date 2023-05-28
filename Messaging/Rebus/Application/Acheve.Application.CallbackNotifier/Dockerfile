@@ -3,7 +3,7 @@
 FROM mcr.microsoft.com/dotnet/core/runtime:3.1-buster-slim AS base
 WORKDIR /app
 
-FROM mcr.microsoft.com/dotnet/core/sdk:3.1-buster AS build
+FROM mcr.microsoft.com/dotnet/sdk: 7.0.302-bullseye-slim AS build
 WORKDIR /src
 COPY ["CallbackNotifier/CallbackNotifier.csproj", "CallbackNotifier/"]
 RUN dotnet restore "CallbackNotifier/CallbackNotifier.csproj"

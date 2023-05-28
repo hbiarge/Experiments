@@ -40,7 +40,9 @@ namespace Acheve.Application.EstimationProcessor
                         .MinimumLevel.Override("System", LogEventLevel.Information)
                         .Enrich.WithProperty("Application", Constants.Services.EstimationService)
                         .WriteTo.Console()
-                        .WriteTo.ApplicationInsights(Constants.ApplicationInsightsInstrumentationKey, new TraceTelemetryConverter())
+                        .WriteTo.ApplicationInsights(
+                            Constants.Azure.Apm.ApplicationInsightsInstrumentationKey, 
+                            new TraceTelemetryConverter())
                         .CreateLogger();
 
                     builder.ClearProviders();
@@ -50,7 +52,7 @@ namespace Acheve.Application.EstimationProcessor
                 .ConfigureServices((hostContext, services) =>
                 {
                     services.AddApplicationInsightsTelemetryWorkerService(config =>
-                        config.ConnectionString = Constants.ApplicationInsightsInstrumentationKey);
+                        config.ConnectionString = Constants.Azure.Apm.ApplicationInsightsInstrumentationKey);
                     services.AddSingleton<ITelemetryInitializer>(sp => new ServiceNameInitializer(Constants.Services.EstimationService));
 
                     services.Configure<ServicesConfiguration>(hostContext.Configuration.GetSection("Service"));

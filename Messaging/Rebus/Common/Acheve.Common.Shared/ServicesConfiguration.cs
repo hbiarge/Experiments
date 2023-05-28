@@ -38,39 +38,16 @@ namespace Acheve.Common.Shared
 
     public class ServicesPostConfiguration : IPostConfigureOptions<ServicesConfiguration>
     {
-        private const string Localhost = "localhost";
+        private const string BaseUri = "http://localhost";
 
         public void PostConfigure(string name, ServicesConfiguration options)
         {
-            if (options.Api is null)
-            {
-                options.Api = ServicesConfiguration.HostInfo.Create("http://localhost:5000");
-            }
-
-            if (options.Images is null)
-            {
-                options.Images = ServicesConfiguration.HostInfo.Create("http://localhost:5001");
-            }
-
-            if (options.ImageProcess is null)
-            {
-                options.ImageProcess = ServicesConfiguration.HostInfo.Create("http://localhost:5002");
-            }
-
-            if (options.Estimations is null)
-            {
-                options.Estimations = ServicesConfiguration.HostInfo.Create("http://localhost:5003");
-            }
-
-            if (options.Notifications is null)
-            {
-                options.Notifications = ServicesConfiguration.HostInfo.Create("http://localhost:5004");
-            }
-
-            if (options.StateHolder is null)
-            {
-                options.StateHolder = ServicesConfiguration.HostInfo.Create("https://localhost:5005");
-            }
+            options.Api ??= ServicesConfiguration.HostInfo.Create($"{BaseUri}:5000");
+            options.Images ??= ServicesConfiguration.HostInfo.Create($"{BaseUri}:5001");
+            options.ImageProcess ??= ServicesConfiguration.HostInfo.Create($"{BaseUri}:5002");
+            options.Estimations ??= ServicesConfiguration.HostInfo.Create($"{BaseUri}:5003");
+            options.Notifications ??= ServicesConfiguration.HostInfo.Create($"{BaseUri}:5004");
+            options.StateHolder ??= ServicesConfiguration.HostInfo.Create($"{BaseUri}:5005");
         }
     }
 }

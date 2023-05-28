@@ -31,7 +31,7 @@ namespace Acheve.Application.Api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddApplicationInsightsTelemetry(config =>
-                config.ConnectionString= Constants.ApplicationInsightsInstrumentationKey);
+                config.ConnectionString= Constants.Azure.Apm.ApplicationInsightsInstrumentationKey);
             services.AddSingleton<ITelemetryInitializer>(sp => new ServiceNameInitializer(Constants.Services.Api));
 
             services.Configure<ServicesConfiguration>(Configuration.GetSection("Service"));

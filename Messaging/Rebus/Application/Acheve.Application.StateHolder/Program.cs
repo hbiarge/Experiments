@@ -35,7 +35,9 @@ namespace Acheve.Application.StateHolder
                         .MinimumLevel.Override("System", LogEventLevel.Information)
                         .Enrich.WithProperty("Application", Constants.Services.StateHolder)
                         .WriteTo.Console()
-                        .WriteTo.ApplicationInsights(Constants.ApplicationInsightsInstrumentationKey, new TraceTelemetryConverter())
+                        .WriteTo.ApplicationInsights(
+                            Constants.Azure.Apm.ApplicationInsightsInstrumentationKey, 
+                            new TraceTelemetryConverter())
                         .CreateLogger();
 
                     builder.ClearProviders();

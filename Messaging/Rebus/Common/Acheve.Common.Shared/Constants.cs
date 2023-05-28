@@ -2,10 +2,13 @@
 {
     public static class Constants
     {
-        public const string ApplicationInsightsInstrumentationKey = "AI instrumentation key";
-
         public static class Azure
         {
+            public static class Apm
+            {
+                public const string ApplicationInsightsInstrumentationKey = "AI instrumentation key";
+            }
+
             public static class ServiceBus
             {
                 // RootManageSharedAccessKey for the demo purposes. Then you can tell rebus to use access policies without management permissions

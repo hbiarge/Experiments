@@ -40,7 +40,9 @@ namespace Acheve.Application.CallbackNotifier
                         .MinimumLevel.Override("System", LogEventLevel.Information)
                         .Enrich.WithProperty("Application", Constants.Services.NotificationService)
                         .WriteTo.Console()
-                        .WriteTo.ApplicationInsights(Constants.ApplicationInsightsInstrumentationKey, new TraceTelemetryConverter())
+                        .WriteTo.ApplicationInsights(
+                            Constants.Azure.Apm.ApplicationInsightsInstrumentationKey, 
+                            new TraceTelemetryConverter())
                         .CreateLogger();
 
                     builder.ClearProviders();
@@ -50,7 +52,7 @@ namespace Acheve.Application.CallbackNotifier
                 .ConfigureServices((hostContext, services) =>
                 {
                     services.AddApplicationInsightsTelemetryWorkerService(config => 
-                        config.ConnectionString = Constants.ApplicationInsightsInstrumentationKey);
+                        config.ConnectionString = Constants.Azure.Apm.ApplicationInsightsInstrumentationKey);
                     services.AddSingleton<ITelemetryInitializer>(sp => new ServiceNameInitializer(Constants.Services.NotificationService));
 
                     services.Configure<ServicesConfiguration>(hostContext.Configuration.GetSection("Service"));

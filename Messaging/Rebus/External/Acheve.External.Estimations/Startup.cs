@@ -21,7 +21,7 @@ namespace Acheve.External.Estimations
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddApplicationInsightsTelemetry(config =>
-                config.ConnectionString = Constants.ApplicationInsightsInstrumentationKey); 
+                config.ConnectionString = Constants.Azure.Apm.ApplicationInsightsInstrumentationKey); 
             services.AddSingleton<ITelemetryInitializer>(sp => new ServiceNameInitializer(Constants.Services.External.Estimations));
 
             services.Configure<ServicesConfiguration>(Configuration.GetSection("Service"));
